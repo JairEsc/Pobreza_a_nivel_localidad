@@ -30,7 +30,7 @@ mean(c(as.numeric(stri_extract_first(localidades_urbanas_c_pobreza$`Rango de pob
 ,as.numeric(stri_extract_last(localidades_urbanas_c_pobreza$`Rango de pobreza (%)`[1],regex = "\\d+"))))
 
 
-))
+
 ##Datos dummy para las localidades rurales de tipo poligono: 
 sample(x = 1000:100000,size = (2505),replace = T)
 
@@ -40,6 +40,9 @@ localidades_urbanas_c_pobreza=localidades_urbanas_c_pobreza |>
                                                    stri_extract_last(`Rango de pobreza (%)`,regex = "\\d+"))))/100))
 localidades_urbanas_c_pobreza$pob_abs=sample(x = 1000:100000,size = (2505),replace = T)
 colorear_rojos_factor=colorFactor(palette = c("yellow","yellow","orange","red","red"),domain = c("[0-20)", "[20,40)", "[40,60)", "[60,80)", "[80-100]"))     
+
+
+
 
 colorear_rojos=colorNumeric(palette = c("yellow","red","red"),domain = sqrt(localidades_urbanas_c_pobreza$pob_abs))
 table(pobreza_urbana |> dplyr::select(Municipio)) |> sort()
@@ -51,5 +54,17 @@ mapa_web=leaflet() |>
               fillColor = colorear_rojos(sqrt(localidades_urbanas_c_pobreza$pob_abs)),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1) |> 
   addLegend(title = "Porcentaje de Pobreza",,position = "bottomright",pal = colorear_rojos_factor,values =c("[0-20)", "[20,40)", "[40,60)", "[60,80)", "[80-100]"), opacity = 1)
 mapa_web
+
+
+
+
+
+
+
+
+
+
+
+
 
 saveWidget(mapa_web,file = "Entregables/Mapa web/pobreza_a_nivel_localidad.html",title = "Pobreza X Localidad")
