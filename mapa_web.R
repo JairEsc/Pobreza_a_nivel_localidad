@@ -44,25 +44,106 @@ colorear_rojos_factor=colorFactor(palette = c("yellow","yellow","orange","red","
 
 
 
-colorear_rojos=colorNumeric(palette = c("yellow","red","red"),domain = sqrt(localidades_urbanas_c_pobreza$pob_abs))
-table(pobreza_urbana |> dplyr::select(Municipio)) |> sort()
+colorear_rojos=colorNumeric(palette = c("yellow","red","red"),domain = c(0,localidades_poligonos_c_pobreza$valor_pobreza |> max()))
+#table(pobreza_urbana |> dplyr::select(Municipio)) |> sort()
 mapa_web=leaflet() |> 
   addTiles(options = leaflet::tileOptions(opacity =0.6))|>
   addPolygons(data=municipios |> as("Spatial"),
-              label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 3) |> 
+              label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 3,group = "Municipios") |> 
   addPolygons(data=localidades_urbanas_c_pobreza |> st_transform(st_crs("EPSG:4326")),
-              fillColor = colorear_rojos(sqrt(localidades_urbanas_c_pobreza$pob_abs)),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1) |> 
-  addLegend(title = "Porcentaje de Pobreza",,position = "bottomright",pal = colorear_rojos_factor,values =c("[0-20)", "[20,40)", "[40,60)", "[60,80)", "[80-100]"), opacity = 1)
+              fillColor = colorear_rojos((localidades_urbanas_c_pobreza$valor_pobreza)),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
+              
+              popup = paste0("Municipio: ",localidades_urbanas_c_pobreza$Municipio," <br>",
+                             "Localidad: ",localidades_urbanas_c_pobreza$NOMGEO,"<br>",
+                             "pobtot: ",localidades_urbanas_c_pobreza$`Población del ITER**`,"<br>",
+                             "intervalo_pobreza: ",localidades_urbanas_c_pobreza$`Rango de pobreza (%)`,"<br>",
+                             "porcentaje municipal: ",localidades_urbanas_c_pobreza$`Pobr%`,"---",localidades_urbanas_c_pobreza$`Pobr_mode%`,"---",localidades_urbanas_c_pobreza$`Pobr_ext%`,"<br>"
+                             )
+              ,group = "Localidades urbanas"
+              ) |> 
+  addPolygons(data=localidades_rurales_poligonos_c_pobreza |> st_transform(st_crs("EPSG:4326")),
+              fillColor = colorear_rojos(as.numeric((localidades_rurales_poligonos_c_pobreza$`Pobr%`))),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
+              
+              popup = paste0("Municipio: ",localidades_rurales_poligonos_c_pobreza$NOM_MUN," <br>",
+                             "Localidad: ",localidades_rurales_poligonos_c_pobreza$NOMGEO,"<br>",
+                             "pobtot: ",localidades_rurales_poligonos_c_pobreza$POBTOT,"<br>",
+                             "porcentaje municipal: ",localidades_urbanas_c_pobreza$`Pobr%`,"---",localidades_urbanas_c_pobreza$`Pobr_mode%`,"---",localidades_urbanas_c_pobreza$`Pobr_ext%`,"<br>",
+                             "absoluto municipal: ",as.numeric(localidades_rurales_poligonos_c_pobreza$POBTOT)*as.numeric(localidades_rurales_poligonos_c_pobreza$`Pobr%`)/100,"<br>",
+                             "absoluto municipal moderada: ",as.numeric(localidades_rurales_poligonos_c_pobreza$POBTOT)*as.numeric(localidades_rurales_poligonos_c_pobreza$`Pobr_mode%`)/100,"<br>",
+                             "absoluto municipal extrema: ",as.numeric(localidades_rurales_poligonos_c_pobreza$POBTOT)*as.numeric(localidades_rurales_poligonos_c_pobreza$`Pobr_ext%`)/100,"<br>"
+              )
+              ,group = "Localidades Rurales"
+              ) |> 
+  addPolygons(data=localidades_puntuales_c_demo |> st_transform(st_crs("EPSG:4326")) |> st_buffer(200),
+              fillColor = colorear_rojos(as.numeric((localidades_puntuales_c_demo$`Pobr%`))),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
+              
+              popup = paste0("Municipio: ",localidades_puntuales_c_demo$NOM_MUN," <br>",
+                             "Localidad: ",localidades_puntuales_c_demo$NOMGEO,"<br>",
+                             "pobtot: ",localidades_puntuales_c_demo$POB1,"<br>",
+                             "porcentaje municipal: ",localidades_puntuales_c_demo$`Pobr%`,"---",localidades_puntuales_c_demo$`Pobr_mode%`,"---",localidades_puntuales_c_demo$`Pobr_ext%`,"<br>",
+                             "absoluto municipal: ",as.numeric(localidades_puntuales_c_demo$POB1)*as.numeric(localidades_puntuales_c_demo$`Pobr%`)/100,"<br>",
+                             "absoluto municipal moderada: ",as.numeric(localidades_puntuales_c_demo$POB1)*as.numeric(localidades_puntuales_c_demo$`Pobr_mode%`)/100,"<br>",
+                             "absoluto municipal extrema: ",as.numeric(localidades_puntuales_c_demo$POB1)*as.numeric(localidades_puntuales_c_demo$`Pobr_ext%`)/100,"<br>"
+              )
+              ,group = "Localidades Rurales punto"
+              ) |> 
+  addLayersControl(overlayGroups = c("Localidades urbanas","Localidades Rurales", "Localidades Rurales punto"),options = layersControlOptions(collapsed = F)) |> 
+  addLegend(title = "Porcentaje de Pobreza",,position = "bottomright",pal = colorear_rojos_factor,values =c("[0-20)", "[20,40)", "[40,60)", "[60,80)", "[80-100]"), opacity = 1) |> 
+  addSearchFeatures(targetGroups = "Municipios",
+                    options = searchFeaturesOptions(
+                      zoom = 12, 
+                      openPopup = F,
+                      firstTipSubmit =F,initial = F,
+                      hideMarkerOnCollapse =T))|>setView(lng = -98.7591, lat = 20.0511, zoom = 9) |> 
+  addEasyButton(
+    easyButton(
+      icon = "fa-info-circle",
+      title = "Información",
+      onClick = JS("function(btn, map){ 
+        var modal = document.getElementById('infoModal');
+        if (modal) modal.style.display = 'block';
+      }")
+    )
+  ) |> 
+  prependContent(
+    tags$div(
+      id = "infoModal",
+      class = "modal",
+      style = "display:none; position:fixed; top:20%; left:20%; width:60%; background:white; padding:20px; border:2px solid black; z-index:1000;",
+      tags$h3("Información del Mapa"),
+      tags$p("Se utiliza la base de pobreza multidimensional de INEGI 2020 para nivel de municipio y la base de pobreza a nivel de localidad urbana"),
+      tags$button("Cerrar", onclick = "document.getElementById('infoModal').style.display='none'")
+    )
+  )
 mapa_web
 
 
 
 
 
-
-
-
-
+###Minimal_Example_modal
+leaflet() |> 
+  addTiles() |> 
+  addEasyButton(
+    easyButton(
+      icon = "fa-info-circle",
+      title = "Información",
+      onClick = JS("function(btn, map){ 
+        var modal = document.getElementById('infoModal');
+        if (modal) modal.style.display = 'block';
+      }")
+    )
+  ) |> 
+  prependContent(
+    tags$div(
+      id = "infoModal",
+      class = "modal",
+      style = "display:none; position:fixed; top:20%; left:20%; width:60%; background:white; padding:20px; border:2px solid black; z-index:1000;",
+      tags$h3("Información del Mapa"),
+      tags$p("blaaa blaaa blaaa"),
+      tags$button("Cerrar", onclick = "document.getElementById('infoModal').style.display='none'")
+    )
+  )
 
 
 
