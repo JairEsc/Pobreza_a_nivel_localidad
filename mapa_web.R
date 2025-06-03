@@ -43,8 +43,8 @@ colorear_rojos_factor=colorFactor(palette = c("yellow","yellow","orange","red","
 
 
 
-
-colorear_rojos=colorNumeric(palette = c("yellow","red","red"),domain = c(0,localidades_poligonos_c_pobreza$valor_pobreza |> max()))
+colorear_rojos=colorNumeric(palette = c("yellow","#ffc200","#ff9300", "#ff5100","red"),domain = c(0,max(c((localidades_rurales_poligonos_c_pobreza$`Pobr%` |> as.numeric() |> max())
+                                                                                                          ,(localidades_urbanas_c_pobreza$valor_pobreza |> max())))))
 #table(pobreza_urbana |> dplyr::select(Municipio)) |> sort()
 mapa_web=leaflet() |> 
   addTiles(options = leaflet::tileOptions(opacity =0.6))|>
@@ -74,7 +74,7 @@ mapa_web=leaflet() |>
               )
               ,group = "Localidades Rurales"
               ) |> 
-  addPolygons(data=localidades_puntuales_c_demo |> st_transform(st_crs("EPSG:4326")) |> st_buffer(200),
+  addCircleMarkers(data=localidades_puntuales_c_demo |> st_transform(st_crs("EPSG:4326")) ,radius = 1,
               fillColor = colorear_rojos(as.numeric((localidades_puntuales_c_demo$`Pobr%`))),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
               
               popup = paste0("Municipio: ",localidades_puntuales_c_demo$NOM_MUN," <br>",
@@ -122,28 +122,28 @@ mapa_web
 
 
 ###Minimal_Example_modal
-leaflet() |> 
-  addTiles() |> 
-  addEasyButton(
-    easyButton(
-      icon = "fa-info-circle",
-      title = "Información",
-      onClick = JS("function(btn, map){ 
-        var modal = document.getElementById('infoModal');
-        if (modal) modal.style.display = 'block';
-      }")
-    )
-  ) |> 
-  prependContent(
-    tags$div(
-      id = "infoModal",
-      class = "modal",
-      style = "display:none; position:fixed; top:20%; left:20%; width:60%; background:white; padding:20px; border:2px solid black; z-index:1000;",
-      tags$h3("Información del Mapa"),
-      tags$p("blaaa blaaa blaaa"),
-      tags$button("Cerrar", onclick = "document.getElementById('infoModal').style.display='none'")
-    )
-  )
+# leaflet() |> 
+#   addTiles() |> 
+#   addEasyButton(
+#     easyButton(
+#       icon = "fa-info-circle",
+#       title = "Información",
+#       onClick = JS("function(btn, map){ 
+#         var modal = document.getElementById('infoModal');
+#         if (modal) modal.style.display = 'block';
+#       }")
+#     )
+#   ) |> 
+#   prependContent(
+#     tags$div(
+#       id = "infoModal",
+#       class = "modal",
+#       style = "display:none; position:fixed; top:20%; left:20%; width:60%; background:white; padding:20px; border:2px solid black; z-index:1000;",
+#       tags$h3("Información del Mapa"),
+#       tags$p("blaaa blaaa blaaa"),
+#       tags$button("Cerrar", onclick = "document.getElementById('infoModal').style.display='none'")
+#     )
+#   )
 
 
 

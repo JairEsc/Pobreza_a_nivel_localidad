@@ -1,5 +1,5 @@
 #pobreza_municipal_2020
-
+source("../../ASUS Gamer Jair/codigos/puras_librerias.R")
 pobreza_concentrado=read_excel("Datos/Concentrado_indicadores_de_pobreza_2020.xlsx",skip = 3)
 pobreza_concentrado=pobreza_concentrado |> 
   dplyr::filter(`Clave de entidad`=='13' &!is.na(`Clave de entidad`))
@@ -21,9 +21,9 @@ localidades_urbanas_c_pobreza=localidades_urbanas_c_pobreza |>
   dplyr::mutate(valor_pobreza=mean(c(as.numeric( stri_extract_first(`Rango de pobreza (%)`,regex = "\\d+"),
                                              stri_extract_last(`Rango de pobreza (%)`,regex = "\\d+")))))
 
-localidades_urbanas_c_pobreza=merge(localidades_urbanas_c_pobreza |> dplyr::mutate(CVEGEO=substr(CVEGEO,1,5)),
+localidades_urbanas_c_pobreza=merge(localidades_urbanas_c_pobreza |> dplyr::mutate(CVEGEO2=substr(CVEGEO,1,5)),
                                     pobreza_concentrado |> dplyr::select(`Clave de municipio`,Pob_tot_2020:pobr_mode_pob),
-                                    by.x='CVEGEO',by.y='Clave de municipio',all.x=T)
+                                    by.x='CVEGEO2',by.y='Clave de municipio',all.x=T)
 
 
 
