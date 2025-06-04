@@ -39,170 +39,7 @@ localidades_urbanas_c_pobreza=localidades_urbanas_c_pobreza |>
                                 mean(c(as.numeric( stri_extract_first(`Rango de pobreza (%)`,regex = "\\d+"),
                                                    stri_extract_last(`Rango de pobreza (%)`,regex = "\\d+"))))/100))
 localidades_urbanas_c_pobreza$pob_abs=sample(x = 1000:100000,size = (2505),replace = T)
-colorear_rojos_factor=colorFactor(palette = c("yellow","#ffc200","#ff9300", "#ff5100","red"),domain = c("[0-20)", "[20,40)", "[40,60)", "[60,80)", "[80-100]"))     
 
-
-
-colorear_rojos=colorNumeric(palette = c("yellow","#ffc200","#ff9300", "#ff5100","red"),domain = c(0,max(c((localidades_rurales_poligonos_c_pobreza$`Pobr%` |> as.numeric() |> max())
-                                                                                               ,(localidades_urbanas_c_pobreza$valor_pobreza |> max())))))
-css_popup <- "<style>
-    .card {
-            width: 100%; /* Ancho fijo para la card */
-            background-color: #fff;
-            border-radius: 8px;
-            text-align: center;
-            padding: 10px;
-            box-sizing: border-box; /* Incluir padding en el ancho */
-        }
-
-        .card h2 {
-            margin-top: 0;
-            color: #333;
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-
-        .card h3 {
-            color: #555;
-            font-size: 1.2em;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        .coords {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #777;
-            margin-bottom: 10px;
-        }
-
-        .poverty-description {
-            font-size: 0.9em;
-            color: #666;
-            line-height: 1.4;
-            margin-bottom: 20px;
-        }
-
-        .poverty-number {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .divider {
-            border-bottom: 1px solid #eee;
-            margin: 20px 0;
-        }
-
-        .indicators-title {
-            font-size: 1.3em;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .indicators-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            text-align: center;
-        }
-
-        .indicator-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .indicator-item p {
-            margin: 0;
-            font-size: 0.9em;
-            color: #444;
-        }
-
-        .indicator-item .percentage {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #e44d26; /* Color para el porcentaje */
-            margin-top: 5px;
-        }
-
-        .indicator-bar {
-            width: 80%;
-            height: 10px;
-            background-color: #ccc; /* Placeholder para la barra */
-            margin-top: 8px;
-            border-radius: 5px;
-        }
-
-        .indicator-value {
-            font-size: 0.85em;
-            color: #777;
-            margin-top: 5px;
-        }
-  </style>"
-generarPopup=function(
-    #nomgeo_loc,municipio, intervalo,pob_localidad,ind_mun_pob,ind_mun_pob_extr,ind_mun_pob_mod,pob_mun_tot
-    ){
-  
-  #pob_abs_pobreza=mean(c(as.numeric(stri_extract_first(intervalo,regex = "\\d+"))
-   #                      ,as.numeric(stri_extract_last(intervalo,regex = "\\d+"))))*pob_localidad
-  
-  ##HTML##
-  ############NOMGEO############
-  #######Municipio_nombre#######
-        ### (A, B) ###
-            #Porcentaje de población
-            #en pobreza en la 
-            #localidad urbana
-  #*Aproximadamente* valor_num personas en condición de pobreza
-  #----------------------------#
-      ##Indicadores municipales##
-  #Pobreza#  #Pobreza \n Moderada# #Pobreza \n Extrema#
-  # p_1 %          # p_1 %              # p_1 %
-  #\bar            #\bar                #\bar
-  # val_1          #val_2               #val_3
-  
-
-  return(paste0(css_popup,'<div class="card">
-        <h2 id="nomgeo-val">NOMGEO</h2>
-        <h3 id="municipio-nombre-val">Municipio_nombre</h3>
-        <p class="coords" id="coords-val">(A, B)</p>
-
-        <p class="poverty-description">
-            Porcentaje de población en pobreza en la localidad urbana
-        </p>
-        <p class="poverty-number">
-            *Aproximadamente* <span id="valor-num-val">valor_num</span> personas en condición de pobreza
-        </p>
-
-        <div class="divider"></div>
-
-        <h3 class="indicators-title">Indicadores municipales</h3>
-
-        <div class="indicators-grid">
-            <div class="indicator-item">
-                <p style=\'line-height: 3\'>Pobreza</p>
-                <p class="percentage" id="p1-val">p_1%</p>
-                <div class="indicator-bar"></div>
-                <p class="indicator-value" id="val1-val">val_1</p>
-            </div>
-            <div class="indicator-item">
-                <p>Pobreza<br>Moderada</p>
-                <p class="percentage" id="p2-val">p_2%</p>
-                <div class="indicator-bar"></div>
-                <p class="indicator-value" id="val2-val">val_2</p>
-            </div>
-            <div class="indicator-item">
-                <p>Pobreza<br>Extrema</p>
-                <p class="percentage" id="p3-val">p_3%</p>
-                <div class="indicator-bar"></div>
-                <p class="indicator-value" id="val3-val">val_3</p>
-            </div>
-        </div>
-    </div>'))
-}
-  
 #table(pobreza_urbana |> dplyr::select(Municipio)) |> sort()
 mapa_web=leaflet() |> 
   addTiles(options = leaflet::tileOptions(opacity =0.6))|>
@@ -210,6 +47,7 @@ mapa_web=leaflet() |>
               label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 3,group = "Municipios") |> 
   addPolygons(data=localidades_urbanas_c_pobreza |> st_transform(st_crs("EPSG:4326")),
               fillColor = colorear_rojos((localidades_urbanas_c_pobreza$valor_pobreza)),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
+              label = paste0(localidades_urbanas_c_pobreza$NOMGEO,"-",localidades_urbanas_c_pobreza$Municipio),
               
               popup = generarPopup()
                 # paste0("Municipio: ",localidades_urbanas_c_pobreza$Municipio," <br>",
@@ -222,8 +60,8 @@ mapa_web=leaflet() |>
               ) |> 
   addPolygons(data=localidades_rurales_poligonos_c_pobreza |> st_transform(st_crs("EPSG:4326")),
               fillColor = colorear_rojos(as.numeric((localidades_rurales_poligonos_c_pobreza$`Pobr%`))),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
-              
-              popup = generarPopup()
+              label = paste0(localidades_rurales_poligonos_c_pobreza$NOMGEO,"-",localidades_rurales_poligonos_c_pobreza$NOM_MUN),
+              popup = generarPopupRural()
               #   paste0("Municipio: ",localidades_rurales_poligonos_c_pobreza$NOM_MUN," <br>",
               #                "Localidad: ",localidades_rurales_poligonos_c_pobreza$NOMGEO,"<br>",
               #                "pobtot: ",localidades_rurales_poligonos_c_pobreza$POBTOT,"<br>",
@@ -237,7 +75,7 @@ mapa_web=leaflet() |>
   addCircleMarkers(data=localidades_puntuales_c_demo |> st_transform(st_crs("EPSG:4326")) ,radius = 1,
               fillColor = colorear_rojos(as.numeric((localidades_puntuales_c_demo$`Pobr%`))),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
               
-              popup = generarPopup()
+              popup = generarPopupRural(df = localidades_puntuales_c_demo |> dplyr::rename('POBTOT'=POB1))
               #   paste0("Municipio: ",localidades_puntuales_c_demo$NOM_MUN," <br>",
               #                "Localidad: ",localidades_puntuales_c_demo$NOMGEO,"<br>",
               #                "pobtot: ",localidades_puntuales_c_demo$POB1,"<br>",
@@ -250,7 +88,7 @@ mapa_web=leaflet() |>
               ) |> 
   addLayersControl(overlayGroups = c("Localidades urbanas","Localidades Rurales", "Localidades Rurales punto"),options = layersControlOptions(collapsed = F)) |> 
   addLegend(title = "Porcentaje de Pobreza",,position = "bottomright",pal = colorear_rojos_factor,values =c("[0-20)", "[20,40)", "[40,60)", "[60,80)", "[80-100]"), opacity = 1) |> 
-  addSearchFeatures(targetGroups = "Municipios",
+  addSearchFeatures(targetGroups = c("Localidades urbanas","Localidades Rurales"),
                     options = searchFeaturesOptions(
                       zoom = 12,
                       openPopup = F,
@@ -302,17 +140,13 @@ mapa_web=leaflet() |>
           }
         });
       }
-            
     }
 
     // Llamar a resizeMarkers en eventos de zoom y al cargar el mapa
     map.on('zoomend', resizeMarkers);
     map.whenReady(resizeMarkers);
-    }")
+    }")|> addLogo(img = "https://raw.githubusercontent.com/JairEsc/Gob/main/Otros_archivos/imagenes/Planeacion_sigeh.png",src = "remote",width = "400px",height='71px',position = "bottomleft") 
 mapa_web
-
-
-
 
 
 ###Minimal_Example_modal
@@ -338,7 +172,6 @@ mapa_web
 #       tags$button("Cerrar", onclick = "document.getElementById('infoModal').style.display='none'")
 #     )
 #   )
-
 
 
 

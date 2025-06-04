@@ -14,7 +14,6 @@ pobreza_mun_2022=pobreza_mun_2022 |>
 ###pobreza
 pobreza_mun_2022$factor[pobreza_mun_2022$pobreza==1] |> sum()
 
-pobreza_mun_2022_$pob_pobreza |> sum()
 pobreza_mun_2022_=pobreza_mun_2022 |> dplyr::filter(pobreza==1)|> 
   dplyr::mutate(CVE_MUN=substr(ubica_geo,3,5)) |> 
   dplyr::group_by(CVE_MUN,rururb) |> 
