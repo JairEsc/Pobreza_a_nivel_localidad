@@ -136,8 +136,7 @@ generarPopup=function(ambito='urbana',df=localidades_urbanas_c_pobreza |> st_dro
         </p>',
                 '<p class="poverty-number">',
                 '*Aproximadamente* <span id="valor-num-val">',round(pob_abs_pobreza,0),'</span> personas en condición de pobreza
-        </p>',
-                '
+        </p>','
         <div class="divider"></div>
 
         <h3 class="indicators-title">Indicadores municipales</h3>
@@ -224,5 +223,59 @@ generarPopupRural=function(ambito='urbana',df=localidades_rurales_poligonos_c_po
         </div>
     </div>'))
 }
+generarPopupMunicipal=function(ambito='urbana',df=municipios |> st_drop_geometry()
+                      #nomgeo_loc,municipio, intervalo,pob_localidad,ind_mun_pob,ind_mun_pob_extr,ind_mun_pob_mod,pob_mun_tot
+){
+  df=df |> 
+    dplyr::mutate(
+      pobr_pob=round(as.numeric(Pob_tot_2020) *as.numeric(`Pobr%`)/100,0),
+      pobr_mode_pob=round(as.numeric(Pob_tot_2020) *as.numeric(`Pobr_mode%`)/100,0),
+      pobr_extr_pob=round(as.numeric(Pob_tot_2020) *as.numeric(`Pobr_ext%`)/100,0),
+    )
+  ##HTML##
+  ############NOMGEO############
+  #######Municipio_nombre#######
+  ### (A, B) ###
+  #Porcentaje de población
+  #en pobreza en la 
+  #localidad urbana
+  #*Aproximadamente* valor_num personas en condición de pobreza
+  #----------------------------#
+  ##Indicadores municipales##
+  #Pobreza#  #Pobreza \n Moderada# #Pobreza \n Extrema#
+  # p_1 %          # p_1 %              # p_1 %
+  #\bar            #\bar                #\bar
+  # val_1          #val_2               #val_3
+  
+  return(paste0(css_popup,'<div class="card">',
+                '<h2 id="nomgeo-val">',df$NOM_MUN,'</h2>',
+                '<h3 class="indicators-title">Indicadores municipales</h3>',
+                '<div class="indicators-grid">
+            <div class="indicator-item">
+                <p style=\'line-height: 3\'>Pobreza</p>
+                <p class="percentage" id="p1-val">',paste0(round(as.numeric(df$`Pobr%`),1),"%"),'</p>
+                <div class="indicator-bar"></div>',
+                '<p class="indicator-value" id="val2-val">',formatC(big.mark = ",",x = df$pobr_pob,format = "d"),'<br>personas','</p>',
+                '</div>
+            <div class="indicator-item">
+                <p>Pobreza<br>Moderada</p>
+                <p class="percentage" id="p2-val">',paste0(round(as.numeric(df$`Pobr_mode%`),1),"%"),'</p>
+                <div class="indicator-bar"></div>',
+                '<p class="indicator-value" id="val2-val">',formatC(big.mark = ",",x = df$pobr_mode_pob,format = "d"),'<br>personas','</p>',
+                '</div>
+            <div class="indicator-item">
+                <p>Pobreza<br>Extrema</p>
+                <p class="percentage" id="p3-val">',paste0(round(as.numeric(df$`Pobr_ext%`),1),"%"),'</p>
+                <div class="indicator-bar"></div>',
+                '<p class="indicator-value" id="val3-val">',formatC(big.mark = ",",x = df$pobr_extr_pob,format = "d"),'<br>personas','</p>',
+                '</div>
+        </div>
+    </div>'))
+}
 
 
+colorearBarritas=function(vector){
+  return(quantile(x = vector,c(0.25,0.75)))
+}
+colorearBarritas(localidades_urbanas_c_pobreza$valor_pobreza)
+hist(localidades_urbanas_c_pobreza$valor_pobreza)

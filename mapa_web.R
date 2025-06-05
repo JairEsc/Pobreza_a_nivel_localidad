@@ -15,13 +15,13 @@ pobreza_urbana=pobreza_urbana |>
 localidades_urbanas=sf::read_sf("../../Reutilizables/Cartografia/conjunto_de_datos/13l.shp")
 localidades_puntuales=sf::read_sf("../../Reutilizables/Cartografia/conjunto_de_datos/13lpr.shp")
 municipios=sf::read_sf("../../Reutilizables/Cartografia/municipiosjair.shp")
-
+municipios=merge(municipios,pobreza_concentrado,by.x='CVEGEO',by.y='Clave de municipio',all.x=T)
 colnames(pobreza_urbana)[c(2,5)]=c("Entidad federativa","Clave de Localidad")
 localidades_urbanas_c_pobreza=localidades_urbanas |> merge(pobreza_urbana,
                                                            by.x="CVEGEO",by.y='Clave de Localidad',all.x=T)
 localidades_urbanas_c_pobreza=localidades_urbanas_c_pobreza |> 
   dplyr::select(CVEGEO,Municipio,NOMGEO,AMBITO,Localidad:geometry)
-
+localidades_urbanas_c_pobreza$valor_pobreza=10+localidades_urbanas_c_pobreza$valor_pobreza
 
 source("../../ASUS Gamer Jair/codigos/puras_librerias.R")
 ##Propongo que se coloree con respecto al absoluto de la población en pobreza. 
@@ -44,7 +44,8 @@ localidades_urbanas_c_pobreza$pob_abs=sample(x = 1000:100000,size = (2505),repla
 mapa_web=leaflet() |> 
   addTiles(options = leaflet::tileOptions(opacity =0.6))|>
   addPolygons(data=municipios |> as("Spatial"),
-              label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 3,group = "Municipios") |> 
+              label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 3,group = "Municipios",
+              popup = generarPopupMunicipal()) |> 
   addPolygons(data=localidades_urbanas_c_pobreza |> st_transform(st_crs("EPSG:4326")),
               fillColor = colorear_rojos((localidades_urbanas_c_pobreza$valor_pobreza)),color = "black",weight = 0.1,opacity = 1,fillOpacity = 1,
               label = paste0(localidades_urbanas_c_pobreza$NOMGEO,"-",localidades_urbanas_c_pobreza$Municipio),
