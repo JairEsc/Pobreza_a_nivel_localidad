@@ -133,11 +133,15 @@ generarPopup=function(ambito='urbana',df=localidades_urbanas_c_pobreza |> st_dro
         <h2 id="nomgeo-val">',df$NOMGEO,'</h2>',
                 '<h3 id="municipio-nombre-val" style="margin-bottom:0.5em">',df$Municipio,'</h3>',
                 '<div class="divider" style="margin:0.5em"></div><h3 class="indicators-title">Indicadores a nivel localidad</h3>',
-                '<p class="coords" id="coords-val" >',df$`Rango de pobreza (%)`,'</p>',
-                
-                '<p class="poverty-description" style="margin-top:1em">
-            Porcentaje de población en pobreza en la localidad urbana
-        </p>',
+                '<p class="poverty-description" style="margin-top:1em">',
+                ifelse(df$`Rango de pobreza (%)`=="[ 0, 20)",'Menos del 20 porciento de la población de la localidad urbana se encuentra en pobreza',
+                       ifelse(df$`Rango de pobreza (%)`=="[20, 40)",'Entre 20 y 40 porciento de la población de la localidad urbana se encuentra en pobreza',
+                              ifelse(df$`Rango de pobreza (%)`=="[40, 60)","Entre 40 y 60 porciento de la población de la localidad urbana se encuentra en pobreza",
+                                     ifelse(df$`Rango de pobreza (%)`=="[60, 80)","Entre 60 y 80 porciento de la población de la localidad urbana se encuentra en pobreza",
+                                            "Más del 80 porciento de la población de la localidad urbana se encuentra en pobreza" ))
+                              )) ,
+                '</p>'
+        ,
                 '<p class="poverty-number">',
                 'Aproximadamente <span id="valor-num-val">',formatC(big.mark = ",",x =  round(pob_abs_pobreza,0),format = "d"),'</span> personas en condición de pobreza
         </p>','

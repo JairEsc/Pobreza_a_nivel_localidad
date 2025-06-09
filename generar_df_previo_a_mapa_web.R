@@ -26,7 +26,7 @@ localidades_urbanas_c_pobreza=merge(localidades_urbanas_c_pobreza |> dplyr::muta
                                     by.x='CVEGEO2',by.y='Clave de municipio',all.x=T)
 
 
-
+localidades_urbanas_c_pobreza$`Rango de pobreza (%)`
 
 
 
