@@ -96,22 +96,51 @@ mapa_web=leaflet() |>
                       firstTipSubmit =F,initial = F,
                       hideMarkerOnCollapse =T))|>setView(lng = -98.7591, lat = 20.0511, zoom = 9) |> 
   addEasyButton(
-    easyButton(
-      icon = "fa-info-circle",
-      title = "Información",
-      onClick = JS("function(btn, map){ 
-        var modal = document.getElementById('infoModal');
-        if (modal) modal.style.display = 'block';
-      }")
-    )
-  ) |> 
+  easyButton(
+    icon = "fa-info-circle",
+    title = "Información",
+    onClick = JS("function(btn, map){ 
+      var modal = document.getElementById('infoModal');
+      if (modal) modal.style.display = 'block';
+    }")
+  )
+) |> 
   prependContent(
     tags$div(
       id = "infoModal",
       class = "modal",
-      style = "display:none; position:fixed; top:20%; left:20%; width:60%; background:white; padding:20px; border:2px solid black; z-index:1000;",
-      tags$h3("Información del Mapa"),
-      tags$p("Se utiliza la base de pobreza multidimensional de INEGI 2020 para nivel de municipio y la base de pobreza a nivel de localidad urbana"),
+      style = "display:none; position:fixed; top:20%; left:20%; width:60%; background:white; padding:20px; border:2px solid black; z-index:1000; overflow-y: auto;", # Added overflow-y: auto for scroll if content is long
+
+      tags$h4("Metodología"),
+      tags$p(
+        "La elaboración de este mapa se basó en dos fuentes principales de datos y abordó la estimación de la pobreza a dos niveles geográficos distintos:"
+      ),
+      tags$ul(
+        tags$li(
+          tags$strong("Localidades Urbanas (268 polígonos): "),
+          "Por primera vez,",tags$a(href = "https://www.coneval.org.mx/Medicion/Paginas/pobreza_localidad_urbana.aspx", "CONEVAL") ," publicó datos de pobreza a nivel de localidad urbana en 2020. Para estas localidades, filtramos la información para el estado de Hidalgo. Dado que CONEVAL presenta la información como un intervalo del porcentaje de pobreza, tomamos el punto medio de dicho intervalo. Combinamos este valor con los datos de población a nivel de localidad del",tags$a(href = "https://www.inegi.org.mx/programas/ccpv/2020/#tabulados", "INEGI 2020") ," para estimar la ",
+          tags$strong("población en pobreza"),
+          " en cada una de estas 268 localidades urbanas."
+        ),
+        tags$li(
+          tags$strong("Otras Localidades (rurales y urbanas no cubiertas por CONEVAL a nivel localidad): "),
+          "Para el resto de las más de 5,000 localidades (entre urbanas y rurales) de Hidalgo que están georreferenciadas, se utilizó el ",
+          tags$strong("porcentaje de pobreza del municipio"),
+          " al que pertenecen. Con los datos de población de estas localidades reportados por INEGI, se estimó la población en pobreza utilizando los indicadores de pobreza a nivel municipal (pobreza, pobreza moderada y pobreza extrema)."
+        )
+      ),
+      tags$p(
+        "Adicionalmente, el mapa también presenta los datos de ",
+        tags$strong("población en pobreza"),
+        ", ",
+        tags$strong("pobreza extrema"),
+        " y ",
+        tags$strong("pobreza moderada"),
+        ", así como sus respectivos porcentajes, a ",
+        tags$strong("nivel municipal"),
+        "."
+      ),
+      
       tags$button("Cerrar", onclick = "document.getElementById('infoModal').style.display='none'")
     )
   ) |> 
