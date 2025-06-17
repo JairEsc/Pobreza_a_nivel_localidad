@@ -15,6 +15,7 @@ pobreza_urbana=pobreza_urbana |>
 localidades_urbanas=sf::read_sf("../../Reutilizables/Cartografia/conjunto_de_datos/13l.shp")
 localidades_puntuales=sf::read_sf("../../Reutilizables/Cartografia/conjunto_de_datos/13lpr.shp")
 municipios=sf::read_sf("../../Reutilizables/Cartografia/municipiosjair.shp")
+lim_mun=read_sf("../../Reutilizables/Cartografia/conjunto_de_datos/13ent.shp")
 municipios=merge(municipios,pobreza_concentrado,by.x='CVEGEO',by.y='Clave de municipio',all.x=T)
 colnames(pobreza_urbana)[c(2,5)]=c("Entidad federativa","Clave de Localidad")
 localidades_urbanas_c_pobreza=localidades_urbanas |> merge(pobreza_urbana,
@@ -31,18 +32,17 @@ mean(c(as.numeric(stri_extract_first(localidades_urbanas_c_pobreza$`Rango de pob
 
 
 
-##Datos dummy para las localidades rurales de tipo poligono: 
-sample(x = 1000:100000,size = (2505),replace = T)
 
 localidades_urbanas_c_pobreza=localidades_urbanas_c_pobreza |> 
   dplyr::mutate(pob_abs=floor(`Población del ITER**`*
                                 mean(c(as.numeric( stri_extract_first(`Rango de pobreza (%)`,regex = "\\d+"),
                                                    stri_extract_last(`Rango de pobreza (%)`,regex = "\\d+"))))/100))
 localidades_urbanas_c_pobreza$pob_abs=sample(x = 1000:100000,size = (2505),replace = T)
-
+municipios  |> st_union()|> st_cast("MULTIPOLYGON") |> st_cast("POLYGON")|> plot()
 #table(pobreza_urbana |> dplyr::select(Municipio)) |> sort()
-mapa_web=leaflet() |> 
+mapa_web=leaflet()  |> 
   addTiles(options = leaflet::tileOptions(opacity =0.6))|>
+  setView(lng =-98.88704 ,lat =20.47901,zoom=9) |> 
   addPolygons(data=municipios |> as("Spatial"),
               label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 3,group = "Municipios",
               popup = generarPopupMunicipal()) |> 
@@ -94,7 +94,7 @@ mapa_web=leaflet() |>
                       zoom = 12,
                       openPopup = F,
                       firstTipSubmit =F,initial = F,
-                      hideMarkerOnCollapse =T))|>setView(lng = -98.7591, lat = 20.0511, zoom = 9) |> 
+                      hideMarkerOnCollapse =T)) |> 
   addEasyButton(
   easyButton(
     icon = "fa-info-circle",
@@ -177,7 +177,6 @@ mapa_web=leaflet() |>
     map.whenReady(resizeMarkers);
     }")|> addLogo(img = "https://raw.githubusercontent.com/JairEsc/Gob/main/Otros_archivos/imagenes/Planeacion_sigeh.png",src = "remote",width = "400px",height='71px',position = "bottomleft") 
 mapa_web
-
 
 ###Minimal_Example_modal
 # leaflet() |> 
